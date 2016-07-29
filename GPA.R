@@ -1,6 +1,6 @@
 #perform general procrustes analysis (GPA) on the dive data by hour
 
-blah<-rest_temp
+blah<-maxPress_hour
 blah<-aggregate(MaxPress~Year+Hour,data=blah,FUN="mean")
 blah<-blah[order(blah$Year),]
 blah<-abind(split(blah,blah$Year), along=3)

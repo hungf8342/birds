@@ -1,3 +1,5 @@
+#graphs mean dive, bout, or trip parameters by year and labels the bars with the sample size
+# i.e. par_graph(bout_table,bout_count) yields a group of bar charts, one for each bout parameter. 
 par_graph<-function(table,labels) {
   plots=list()
   
@@ -10,10 +12,13 @@ par_graph<-function(table,labels) {
   print(plots)
   multiplot(plotlist=plots, cols=1)
 }
+
+#graphs maxPressure by hour for a given year (data table)
 graph_maxPress<-function(table) {
   ggplot(table,aes(Hour,MaxPress))+geom_bar(stat="identity")
 }
 
+#graphs maxPressure by hour for every year
 graph_all_maxPress<-function(table) {
   plot=list()
   plot<-lapply(2008:2015, function(year) graph_maxPress(table[table["Year"]==year,]))

@@ -1,4 +1,4 @@
-#Here, we divide all dives into three categories by time of day (morn, midd, and night) and run ANOVA
+#Here, we divide all dives into three categories by time of day (morn, midd, and night) and run ANOVA/Tukey HSD
 
 formodel<-AllDives[c("File", "Year", "StartDate","StartTime", "MaxPress")]
 formodel<-mutate(formodel, substr(as.character(formodel$StartDate), 6,7))
@@ -17,23 +17,26 @@ formodel<-formodel[(formodel$Hour>4) & (formodel$Hour<21),]
 
 #assign time of day for each dive
 for (i in 1:nrow(formodel)) {
-  if ((formodel[i ,"Hour"]>4) & (formodel[i ,"Hour"]<10)) {
-    formodel[i,"TOD"]="morn"
+  if ((formodel[i ,"Hour"]>4) & (formodel[i ,"Hour"]<11)) {
+    formodel[i,"TOD"]="morning"
   }
-  else if ((formodel[i ,"Hour"]>=10) & (formodel[i ,"Hour"]<15)) {
-    formodel[i,"TOD"]="midd"
+  else if ((formodel[i ,"Hour"]>=11) & (formodel[i ,"Hour"]<16)) {
+    formodel[i,"TOD"]="midday"
   }
   else {
     formodel[i,"TOD"]="night"
   }
 }
 formodel$TOD<-as.factor(formodel$TOD)
+formodel$TOD=factor(formodel$TOD,c("morning","midday","night"))
 
 #represent relationship between max.dive depth (maxPress) and TOD with a mixed linear model (random eff. is individual bird)
 reducedmodelTOD<-lme(MaxPress~TOD,method="ML", random=~1|File, data=formodel, na.action=na.omit)
 
 #boxplot of maxPress vs. TOD
-ggplot(formodel, aes(x=TOD, y=MaxPress))+geom_boxplot()
+ggplot(formodel, aes(x=TOD, y=MaxPress))+geom_boxplot()+theme(plot.title=element_text(size=14),axis.title=element_text(size=17),
+                                                              axis.text=element_text(size=14))
 
-#ANOVA of TOD
-anova(reducedmodelTOD)
+#ANOVA/Tukey HSD of TOD
+a1<-anova(reducedmodelTOD)
+summary(glht(reducedmodelTOD,linfct=mcp(TOD="Tukey")))
